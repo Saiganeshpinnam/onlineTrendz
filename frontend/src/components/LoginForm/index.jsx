@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Cookies from 'js-cookie';
+import './index.css'; // ✅ Import styles
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
@@ -12,7 +13,7 @@ const LoginForm = () => {
 
   const onSubmitSuccess = jwtToken => {
     Cookies.set('jwt_token', jwtToken, { expires: 30 });
-    window.location.reload(); // Reload to update auth state
+    window.location.reload();
   };
 
   const onSubmitFailure = msg => {
@@ -48,26 +49,32 @@ const LoginForm = () => {
 
   return (
     <div className="login-form-container">
-      <h2>Login</h2>
-      <form onSubmit={submitForm}>
-        <label>Username:</label>
+      <form onSubmit={submitForm} className="login-form">
+        <h2 className="form-title">🔐 Login</h2>
+
+        <label htmlFor="username">Username:</label>
         <input
+          id="username"
           type="text"
           value={username}
           onChange={onChangeUsername}
           placeholder="admin"
           required
         />
-        <label>Password:</label>
+
+        <label htmlFor="password">Password:</label>
         <input
+          id="password"
           type="password"
           value={password}
           onChange={onChangePassword}
           placeholder="admin123"
           required
         />
-        <button type="submit">Login</button>
-        {showSubmitError && <p className="error-msg">{errorMsg}</p>}
+
+        <button type="submit" className="login-btn">Login</button>
+
+        {showSubmitError && <p className="error-msg">⚠️ {errorMsg}</p>}
       </form>
     </div>
   );
