@@ -1,5 +1,7 @@
+// REMOVE BrowserRouter from here
 import React, { useState } from 'react';
 import Cookies from 'js-cookie';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import ProductList from './components/ProductsList';
 import Cart from './components/Cart';
@@ -7,59 +9,59 @@ import Navbar from './components/Navbar';
 
 const App = () => {
   const [cartItems, setCartItems] = useState([]);
-  console.log("App")
-  // Add product to cart or increase quantity if already exists
-  const addToCart = product => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
-      if (existingItem) {
-        return prevItems.map(item =>
+
+  const addToCart = (product) => {
+    const existing = cartItems.find((item) => item.id === product.id);
+    if (existing) {
+      setCartItems((prev) =>
+        prev.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prevItems, { ...product, quantity: 1 }];
-    });
+        )
+      );
+    } else {
+      setCartItems((prev) => [...prev, { ...product, quantity: 1 }]);
+    }
   };
 
-  // Remove product from cart by id
-  const removeFromCart = productId => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+  const removeFromCart = (productId) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== productId));
   };
 
-  // Update product quantity, but no less than 1
   const updateQuantity = (productId, quantity) => {
     if (quantity < 1) return;
-    setCartItems(prevItems =>
-      prevItems.map(item =>
+    setCartItems((prev) =>
+      prev.map((item) =>
         item.id === productId ? { ...item, quantity } : item
       )
     );
   };
 
-  // Check if user is authenticated by presence of JWT token cookie
   const jwtToken = Cookies.get('jwt_token');
 
-  // If not logged in, show login form
   if (!jwtToken) {
     return <LoginForm />;
   }
 
-  // If logged in, show main app with navbar, product list, and cart
   return (
     <>
       <Navbar cartCount={cartItems.length} />
-      <div style={{ display: 'flex', padding: '20px', gap: '40px' }}>
-        <div style={{ flex: 3 }}>
-          <ProductList onAdd={addToCart} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <Cart
-            cartItems={cartItems}
-            onRemoveItem={removeFromCart}
-            onUpdateQuantity={updateQuantity}
-          />
-        </div>
-      </div>
+      <Routes>
+        <Route
+          path="/"
+          element={<ProductList onAdd={addToCart} />}
+        />
+        <Route
+          path="/cart"
+          element={
+            <Cart
+              cartItems={cartItems}
+              onRemoveItem={removeFromCart}
+              onUpdateQuantity={updateQuantity}
+            />
+          }
+        />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
     </>
   );
 };
