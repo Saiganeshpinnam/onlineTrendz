@@ -24,11 +24,60 @@ const products = [
     imageUrl: 'https://i.pinimg.com/736x/93/b2/07/93b2076863f994b68d5bd268314b8887.jpg',
   },
   {
-    id: 3,
+    id: 4,
     name: 'Beans',
     category: 'vegetables',
     price: 12.0,
     imageUrl: 'https://i.pinimg.com/736x/31/47/15/31471519885b0481e2eb627063b959f7.jpg',
+  },
+  {
+    id: 5,
+    name: 'Freak Shake',
+    category: 'beverages',
+    price: 12.0,
+    imageUrl: 'https://i.pinimg.com/736x/58/f3/8d/58f38d94b629b6627cffb1ecf8993811.jpg',
+  },
+  {
+    id: 6,
+    name: 'chair',
+    category: 'Home Needy',
+    price: 12.0,
+    imageUrl: 'https://i.pinimg.com/736x/db/51/95/db519529496b547c93d1ad8b230559b0.jpg'
+  },
+  {
+    id: 7,
+    name: 'Headphones',
+    category: 'Electronics',
+    price: 12.0,
+    imageUrl: 'https://i.pinimg.com/736x/16/a1/2d/16a12dc16c0e955dcc737d0d894e6669.jpg'
+  },
+  {
+    id: 8,
+    name: 'earrings',
+    category: 'Jewelry',
+    price: 12.0,
+    imageUrl: 'https://i.pinimg.com/736x/34/8f/ed/348fedbafdd6d82f5d48ec8557b96e36.jpg'
+  },
+  {
+    id: 9,
+    name: 'lipstick',
+    category: 'Makeup',
+    price: 12.0,
+    imageUrl: 'https://i.pinimg.com/736x/ef/57/52/ef57526898535dc1b1e753d2d573f72e.jpg'
+  },
+  {
+    id: 10,
+    name: 'lunch-box',
+    category: 'Kitchen',
+    price: 12.0,
+    imageUrl: 'https://i.pinimg.com/1200x/c6/d8/3c/c6d83c72090f1361bd8662e321ce518e.jpg'
+  },
+  {
+    id: 11,
+    name: 'Butter',
+    category: 'Groceries',
+    price: 12.0,
+    imageUrl: 'https://i.pinimg.com/1200x/b4/23/2f/b4232f3271836e8ccf024296e16df204.jpg'
   },
 ];
 
