@@ -77,3 +77,71 @@ body {
 .add-to-cart-btn:hover {
   background-color: #b92b36;
 }
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  background: #f8f8f8;
+}
+
+.product-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 5px rgb(0 0 0 / 0.1);
+  padding: 12px;
+  text-align: center;
+  transition: box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+}
+
+.product-img {
+  border-radius: 8px;
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.product-info {
+  margin-bottom: 12px;
+}
+
+.product-name {
+  font-size: 1rem;
+  margin: 0 0 6px 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.product-category {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 6px;
+  text-transform: capitalize;
+}
+
+.product-price {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #27ae60;
+}
+
+.add-to-cart-btn {
+  background-color: #ff6f61;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #e85c50;
+}
