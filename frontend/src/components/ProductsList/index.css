@@ -10,7 +10,7 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 20px;
   padding: 24px;
-  max-width: 1200px;
+  width: 100vw;
   margin: auto;
 }
 
@@ -63,7 +63,7 @@ body {
 }
 
 .add-to-cart-btn {
-  background-color: #e23744;
+  background-color: #F7CA00;
   border: none;
   color: white;
   padding: 10px;
@@ -75,7 +75,7 @@ body {
 }
 
 .add-to-cart-btn:hover {
-  background-color: #b92b36;
+  background-color: #F7CA00;
 }
 .product-grid {
   display: grid;

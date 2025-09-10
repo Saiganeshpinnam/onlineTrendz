@@ -79,6 +79,20 @@ const products = [
     price: 12.0,
     imageUrl: 'https://i.pinimg.com/1200x/b4/23/2f/b4232f3271836e8ccf024296e16df204.jpg'
   },
+  {
+    id: 12,
+    name: 'Marbles',
+    category: 'Home Needy',
+    price: 'Rs.150',
+    imageUrl: 'https://res.cloudinary.com/dgv10egbw/image/upload/v1757522659/61c05395d302acb922b4d64a72d259fc_lxgu8h.jpg'
+  },
+  {
+    id: 13,
+    name: 'Lamp',
+    category: 'Home Needy',
+    price: 'Rs.450',
+    imageUrl: 'https://res.cloudinary.com/dgv10egbw/image/upload/v1757522744/99c88410917786bedad8feeb49959045_c2dl8l.jpg'
+  },
 ];
 
 const ProductList = ({ onAdd }) => {
@@ -98,7 +112,7 @@ const ProductList = ({ onAdd }) => {
           <div className="product-info">
             <h3 className="product-name">{name}</h3>
             <div className="product-category">{category}</div>
-            <div className="product-price">₹{price}</div>
+            <div className="product-price">₹ {price}/-</div>
           </div>
           <button
             className="add-to-cart-btn"
