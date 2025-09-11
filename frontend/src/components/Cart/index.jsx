@@ -72,7 +72,7 @@ const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onSaveForLater, onOrd
             <img src={item.image} alt={item.name} className="cart-item-image" />
             <div className="cart-item-details">
               <h4>{item.name}</h4>
-              <p>Price: ₹{item.price}</p>
+              <p>Price: ₹{item.price * item.quantity}</p>
               <div className="quantity-controls">
                 <button onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}>-</button>
                 <span>{item.quantity}</span>

@@ -1,5 +1,5 @@
 import React from 'react';
-//import './index.css';
+import './index.css';
 
 const Orders = ({ orders }) => {
   if (orders.length === 0) {
@@ -13,7 +13,7 @@ const Orders = ({ orders }) => {
 
   return (
     <div className="orders-container">
-      <h2>📦 Your Orders</h2>
+      <h2 className='orders-title'>📦 Your Orders</h2>
       <ul className="orders-list">
         {orders.map(order => (
           <li key={order.id} className="order-item">
