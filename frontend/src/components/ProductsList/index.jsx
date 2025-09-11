@@ -83,14 +83,14 @@ const products = [
     id: 12,
     name: 'Marbles',
     category: 'Home Needy',
-    price: 'Rs.150',
+    price: 150.0,
     imageUrl: 'https://res.cloudinary.com/dgv10egbw/image/upload/v1757522659/61c05395d302acb922b4d64a72d259fc_lxgu8h.jpg'
   },
   {
     id: 13,
     name: 'Lamp',
     category: 'Home Needy',
-    price: 'Rs.450',
+    price: 450.0,
     imageUrl: 'https://res.cloudinary.com/dgv10egbw/image/upload/v1757522744/99c88410917786bedad8feeb49959045_c2dl8l.jpg'
   },
 ];

@@ -3,12 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import './index.css';
 
-const Navbar = ({ cartCount, watchlistCount }) => {
+const Navbar = ({ cartCount, watchlistCount, ordersCount }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     Cookies.remove('jwt_token');
-    navigate(0); // full reload to reset state
+    navigate(0);
   };
 
   return (
@@ -19,6 +19,7 @@ const Navbar = ({ cartCount, watchlistCount }) => {
           <li><Link to="/">Home</Link></li>
           <li><Link to="/cart">Cart ({cartCount})</Link></li>
           <li><Link to="/watchlist">Watchlist ({watchlistCount})</Link></li>
+          <li><Link to="/orders">Orders ({ordersCount})</Link></li>
           <li>
             <button className="logout-btn" onClick={handleLogout}>Logout</button>
           </li>

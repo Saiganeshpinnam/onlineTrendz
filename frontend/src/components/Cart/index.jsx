@@ -1,51 +1,121 @@
-import React from 'react';
-import './index.css'; // ✅ Ensure styles are updated as well
+import React, { useState } from 'react';
+import './index.css';
 
-const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onSaveForLater }) => {
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
+const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onSaveForLater, onOrderPlaced }) => {
+  const [orderedItems, setOrderedItems] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderSummary, setOrderSummary] = useState([]);
 
-  return (
-    <div className="cart-container">
-      <h2 className="cart-title">🛒 Your Cart</h2>
-      {cartItems.length === 0 ? (
-        <p className="cart-empty">Your cart is empty.</p>
-      ) : (
-        <>
-          <ul className="cart-items">
-            {cartItems.map(item => (
-              <li key={item.id} className="cart-item">
-                <img src={item.image} alt={item.name} className="cart-item-image" />
-                
-                <div className="cart-item-details">
-                  <h4 className="item-name">{item.name}</h4>
-                  <p className="item-price">Price: ₹{item.price * item.quantity}</p>
-                  
-                  {item.stock === 1 && (
-                    <p className="stock-warning">⚠️ Order soon — 1 left in stock!</p>
-                  )}
-                  
-                  <div className="quantity-controls">
-                    <button onClick={() => onUpdateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>-</button>
-                    <span>{item.quantity}</span>
-                    <button onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}>+</button>
-                  </div>
+  const calculateTotal = () =>
+    cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-                  <div className="item-actions">
-                    <button className="remove-btn" onClick={() => onRemoveItem(item.id)}>
-                      Remove
-                    </button>
-                    <button className="save-btn" onClick={() => onSaveForLater(item.id)}>
-                      Save for Later
-                    </button>
-                  </div>
+  const handleProceedToPay = () => {
+    if (!paymentMethod) {
+      alert('⚠️ Please select a payment method');
+      return;
+    }
+
+    const summary = cartItems.map(item => {
+      const randomDays = Math.floor(Math.random() * 6) + 2; // 2–7 days
+      return {
+        ...item,
+        deliveryDays: randomDays,
+        orderPlaced: true,
+      };
+    });
+
+    setOrderedItems(summary.map(i => i.id));
+    setOrderSummary(summary);
+    setOrderSuccess(true);
+
+    if (typeof onOrderPlaced === 'function') {
+      onOrderPlaced(summary);
+    }
+  };
+
+  if (cartItems.length === 0 && !orderSuccess) {
+    return <p className="cart-empty">🛒 Your cart is empty</p>;
+  }
+
+  if (orderSuccess) {
+    return (
+      <div className="success-screen">
+        <div className="order-success">✅ Order placed successfully!</div>
+        <p className="thank-you">😊 Thanks for shopping with us!</p>
+        <div className="order-summary">
+          <h3>📦 Order Summary</h3>
+          <ul>
+            {orderSummary.map(item => (
+              <li key={item.id} className="order-item">
+                <img src={item.image} alt={item.name} className="order-item-image" />
+                <div>
+                  <p className="order-item-name">{item.name}</p>
+                  <p>Qty: {item.quantity}</p>
+                  <p className="delivery-info">Estimated Delivery: {item.deliveryDays} days</p>
+                  <p className="order-status">✅ Order Placed</p>
                 </div>
               </li>
             ))}
           </ul>
+        </div>
+      </div>
+    );
+  }
 
-          <h3 className="cart-total">Total: ₹{total}</h3>
-        </>
-      )}
+  return (
+    <div className="cart-container">
+      <h2 className="cart-title">🛒 Your Cart</h2>
+      <ul className="cart-items">
+        {cartItems.map(item => (
+          <li key={item.id} className="cart-item">
+            <img src={item.image} alt={item.name} className="cart-item-image" />
+            <div className="cart-item-details">
+              <h4>{item.name}</h4>
+              <p>Price: ₹{item.price}</p>
+              <div className="quantity-controls">
+                <button onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}>-</button>
+                <span>{item.quantity}</span>
+                <button onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}>+</button>
+              </div>
+              <div className="cart-item-actions">
+                <button className="remove-btn" onClick={() => onRemoveItem(item.id)}>Remove</button>
+                <button className="save-btn" onClick={() => onSaveForLater(item.id)}>Save for Later</button>
+              </div>
+              {orderedItems.includes(item.id) && (
+                <p className="order-placed-label">✅ Order Placed</p>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div className="cart-summary">
+        <h3>Total: ₹{calculateTotal()}</h3>
+        <div className="payment-method">
+          <label>
+            <input
+              type="radio"
+              name="payment"
+              value="cod"
+              onChange={e => setPaymentMethod(e.target.value)}
+            />
+            Cash on Delivery
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="payment"
+              value="upi"
+              onChange={e => setPaymentMethod(e.target.value)}
+            />
+            UPI
+          </label>
+        </div>
+        <button className="proceed-btn" onClick={handleProceedToPay}>
+          Proceed to Pay
+        </button>
+      </div>
     </div>
   );
 };
