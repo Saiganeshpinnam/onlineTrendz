@@ -83,3 +83,10 @@
   color: #2980b9; /* Blue for delivery */
   font-style: italic;
 }
+.no-orders-placed{
+    text-align: center;
+    font-size: 21px;
+    font-weight: bold;
+    margin-top: 40px;
+    color: #777;
+}

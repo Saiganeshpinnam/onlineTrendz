@@ -6,7 +6,7 @@ const Orders = ({ orders }) => {
     return (
       <div className="orders-container">
         <h2>📦 Your Orders</h2>
-        <p>No orders placed yet.</p>
+        <p className='no-orders-placed'>No orders placed yet.</p>
       </div>
     );
   }

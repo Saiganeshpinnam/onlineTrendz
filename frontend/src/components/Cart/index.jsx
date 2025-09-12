@@ -35,9 +35,11 @@ const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onSaveForLater, onOrd
   };
 
   if (cartItems.length === 0 && !orderSuccess) {
-    return <p className="cart-empty">🛒 Your cart is empty</p>;
+    return <div className='empty-cart-container'><p className="cart-empty">🛒 Your cart is empty</p> 
+    <img src="https://res.cloudinary.com/dgv10egbw/image/upload/v1757684630/Screenshot_2025-09-12_191334_duvbjy.png" alt="Empty Cart" className="empty-cart-image" />
+    </div>;
   }
-
+  
   if (orderSuccess) {
     return (
       <div className="success-screen">
