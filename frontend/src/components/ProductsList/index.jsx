@@ -95,44 +95,79 @@ const products = [
   },
 ];
 
-const ProductList = ({ onAdd }) => {
+const ProductList = ({ onAdd, searchTerm = '' }) => {
   const [addedItems, setAddedItems] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   const handleAddToCart = (product) => {
-    onAdd(product); // still calls parent handler
+    onAdd(product);
     setAddedItems((prev) => [...prev, product.id]);
   };
 
+  const categories = ['All', ...new Set(products.map(product => product.category))];
+
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory =
+      selectedCategory === 'All' || product.category === selectedCategory;
+
+    const matchesSearch = product.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
+
   return (
-    <div className="product-grid">
-      {products.map(({ id, name, category, price, imageUrl }) => {
-        const isAdded = addedItems.includes(id);
-        return (
-          <div key={id} className="product-card">
-            <img
-              src={imageUrl}
-              alt={name}
-              className="product-img"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/150?text=No+Image';
-              }}
-            />
-            <div className="product-info">
-              <h3 className="product-name">{name}</h3>
-              <div className="product-category">{category}</div>
-              <div className="product-price">₹ {price}/-</div>
-            </div>
-            <button
-              className={`add-to-cart-btn ${isAdded ? 'added' : ''}`}
-              onClick={() => handleAddToCart({ id, name, price, category, image: imageUrl })}
-              disabled={isAdded}
-            >
-              {isAdded ? '✔ Added' : 'Add to Cart'}
-            </button>
-          </div>
-        );
-      })}
+    <div className="product-wrapper">
+      <div className="category-filter">
+        <label htmlFor="category-select">Filter by Category:</label>
+        <select
+          id="category-select"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        >
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category[0].toUpperCase() + category.slice(1)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="product-grid">
+        {filteredProducts.length === 0 ? (
+          <p className="no-results">No products found.</p>
+        ) : (
+          filteredProducts.map(({ id, name, category, price, imageUrl }) => {
+            const isAdded = addedItems.includes(id);
+            return (
+              <div key={id} className="product-card">
+                <img
+                  src={imageUrl}
+                  alt={name}
+                  className="product-img"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/150?text=No+Image';
+                  }}
+                />
+                <div className="product-info">
+                  <h3 className="product-name">{name}</h3>
+                  <div className="product-category">{category}</div>
+                  <div className="product-price">₹ {price}/-</div>
+                </div>
+                <button
+                  className={`add-to-cart-btn ${isAdded ? 'added' : ''}`}
+                  onClick={() => handleAddToCart({ id, name, price, category, image: imageUrl })}
+                  disabled={isAdded}
+                >
+                  {isAdded ? '✔ Added' : 'Add to Cart'}
+                </button>
+              </div>
+            );
+          })
+        )}
+      </div>
     </div>
   );
 };

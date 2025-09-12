@@ -150,3 +150,18 @@ body {
 .add-to-cart-btn:hover {
   background-color: #e85c50;
 }
+.category-filter {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin: 20px;
+  
+}
+
+.category-filter select {
+  padding: 6px 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}

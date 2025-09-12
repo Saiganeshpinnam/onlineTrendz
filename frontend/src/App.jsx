@@ -11,16 +11,23 @@ import Orders from './components/Orders';
 const App = () => {
   const [cartItems, setCartItems] = useState([]);
   const [watchlistItems, setWatchlistItems] = useState([]);
-  const [orders, setOrders] = useState([]); // ✅ NEW orders state
+  const [orders, setOrders] = useState([]);
+
+  // Add these two lines:
+  const [searchTerm, setSearchTerm] = useState('');
 
   const navigate = useNavigate();
+  const jwtToken = Cookies.get('jwt_token');
 
+  // Add to Cart
   const addToCart = (product) => {
     const existing = cartItems.find((item) => item.id === product.id);
     if (existing) {
       setCartItems((prev) =>
         prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         )
       );
     } else {
@@ -28,52 +35,64 @@ const App = () => {
     }
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== productId));
-  };
+  // Update quantity
+  const updateCartQuantity = (id, newQty) => {
+    if (newQty < 1) {
+      removeFromCart(id);
+      return;
+    }
 
-  const updateQuantity = (productId, quantity) => {
-    if (quantity < 1) return;
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === productId ? { ...item, quantity } : item
+        item.id === id ? { ...item, quantity: newQty } : item
       )
     );
   };
 
-  const saveForLater = (productId) => {
-    const item = cartItems.find((item) => item.id === productId);
-    if (!item) return;
-
-    removeFromCart(productId);
-
-    if (watchlistItems.find((w) => w.id === productId)) return;
-
-    setWatchlistItems((prev) => [...prev, { ...item, quantity: 1 }]);
-    alert(`✅ Added "${item.name}" to watchlist!`);
+  // Remove from Cart
+  const removeFromCart = (id) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleAddToCartFromWatchlist = (product) => {
-    addToCart(product);
-    setWatchlistItems((prev) => prev.filter((item) => item.id !== product.id));
+  // Save for Later (move to Watchlist)
+  const saveForLater = (id) => {
+    const item = cartItems.find((item) => item.id === id);
+    if (item) {
+      setWatchlistItems((prev) => [...prev, item]);
+      removeFromCart(id);
+    }
   };
 
-  const handleBuyNow = (product) => {
-    addToCart(product);
-    navigate('/cart');
+  // Remove from Watchlist
+  const removeFromWatchlist = (id) => {
+    setWatchlistItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const removeFromWatchlist = (productId) => {
-    setWatchlistItems((prev) => prev.filter((item) => item.id !== productId));
+  // Buy Now (from Watchlist)
+  const buyNow = (item) => {
+    const randomDays = Math.floor(Math.random() * 6) + 2;
+    const orderItem = {
+      ...item,
+      quantity: 1,
+      deliveryDays: randomDays,
+      orderPlaced: true,
+    };
+    setOrders((prev) => [...prev, orderItem]);
+    removeFromWatchlist(item.id);
+    navigate('/orders');
   };
 
-  // ✅ Capture placed orders from Cart
-  const handleOrderPlaced = (orderedItems) => {
-    setOrders((prev) => [...prev, ...orderedItems]);
+  // Place Order (from Cart)
+  const onOrderPlaced = (orderSummary) => {
+    setOrders((prev) => [...prev, ...orderSummary]);
     setCartItems([]); // clear cart after order placed
   };
 
-  const jwtToken = Cookies.get('jwt_token');
+  // Add from Watchlist to Cart
+  const addFromWatchlistToCart = (item) => {
+    addToCart(item);
+    removeFromWatchlist(item.id);
+  };
 
   if (!jwtToken) {
     return <LoginForm />;
@@ -81,22 +100,27 @@ const App = () => {
 
   return (
     <>
-      <Navbar 
-        cartCount={cartItems.length} 
-        watchlistCount={watchlistItems.length} 
-        ordersCount={orders.length} 
+      <Navbar
+        cartCount={cartItems.length}
+        watchlistCount={watchlistItems.length}
+        ordersCount={orders.length}
+        onSearch={setSearchTerm}  // Pass setter to Navbar for search input
       />
+
       <Routes>
-        <Route path="/" element={<ProductList onAdd={addToCart} />} />
+        <Route
+          path="/"
+          element={<ProductList onAdd={addToCart} searchTerm={searchTerm} />}
+        />
         <Route
           path="/cart"
           element={
             <Cart
               cartItems={cartItems}
               onRemoveItem={removeFromCart}
-              onUpdateQuantity={updateQuantity}
+              onUpdateQuantity={updateCartQuantity}
               onSaveForLater={saveForLater}
-              onOrderPlaced={handleOrderPlaced} // ✅ pass handler
+              onOrderPlaced={onOrderPlaced}
             />
           }
         />
@@ -105,8 +129,8 @@ const App = () => {
           element={
             <Watchlist
               watchlistItems={watchlistItems}
-              onAddToCart={handleAddToCartFromWatchlist}
-              onBuyNow={handleBuyNow}
+              onAddToCart={addFromWatchlistToCart}
+              onBuyNow={buyNow}
               onRemoveFromWatchlist={removeFromWatchlist}
             />
           }

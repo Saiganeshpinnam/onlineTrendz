@@ -72,3 +72,34 @@
 .logout-btn:hover {
   background-color: #c0392b;
 }
+.search-bar {
+  flex: 1;
+  text-align: center;
+}
+
+.search-input {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: none;
+  font-size: 16px;
+  width: 60%;
+  max-width: 400px;
+  min-width: 200px;
+}
+
+/* Optional: Adjust spacing on small screens */
+@media (max-width: 768px) {
+  .search-bar {
+    width: 100%;
+    text-align: left;
+    margin: 12px 0;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .navbar-container {
+    align-items: flex-start;
+  }
+}
