@@ -5,7 +5,7 @@ const products = [
   {
     id: 1,
     name: 'Apple',
-    category: 'fruits',
+    category: 'Fruits',
     price: 1.5,
     imageUrl: 'https://i.pinimg.com/736x/f2/e6/06/f2e606f25bb5f8d4e0ad18d9afdd70fd.jpg',
   },
@@ -92,6 +92,34 @@ const products = [
     category: 'Home Needy',
     price: 450.0,
     imageUrl: 'https://res.cloudinary.com/dgv10egbw/image/upload/v1757522744/99c88410917786bedad8feeb49959045_c2dl8l.jpg',
+  },
+  {
+    id: 14,
+    name: 'Banana',
+    category: 'Fruits',
+    price: 80.0,
+    imageUrl: 'https://res.cloudinary.com/dgv10egbw/image/upload/v1757685192/67ff0431ed4ecbf10ebed90c15eb6d0a_d3j812.jpg',
+  },
+  {
+    id: 16,
+    name: 'Grapes',
+    category: 'Fruits',
+    price: 50.0,
+    imageUrl: 'https://res.cloudinary.com/dgv10egbw/image/upload/v1757685747/58ed80726566c2d9a8044c98f83f7e04_yl7ub6.jpg',
+  },
+  {
+    id: 17,
+    name: 'Strawberries',
+    category: 'Fruits',
+    price: 63.0,
+    imageUrl: 'https://res.cloudinary.com/dgv10egbw/image/upload/v1757685900/f18690a3d6879716620d008792085e9b_cknk6j.jpg',
+  },
+  {
+    id: 18,
+    name: 'Strawberries',
+    category: 'Fruits',
+    price: 63.0,
+    imageUrl: 'https://res.cloudinary.com/dgv10egbw/image/upload/v1757685900/f18690a3d6879716620d008792085e9b_cknk6j.jpg',
   },
 ];
 

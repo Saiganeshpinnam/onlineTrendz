@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
-import Cookies from 'js-cookie';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import LoginForm from './components/LoginForm';
-import ProductList from './components/ProductsList';
-import Cart from './components/Cart';
-import Navbar from './components/Navbar';
-import Watchlist from './components/Watchlist';
-import Orders from './components/Orders';
+import React, { useState } from "react";
+import Cookies from "js-cookie";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import LoginForm from "./components/LoginForm";
+import ProductList from "./components/ProductsList";
+import Cart from "./components/Cart";
+import Navbar from "./components/Navbar";
+import Watchlist from "./components/Watchlist";
+import Orders from "./components/Orders";
+import Chatbot from "./components/Chatbot"; // 👈 import chatbot
 
 const App = () => {
   const [cartItems, setCartItems] = useState([]);
   const [watchlistItems, setWatchlistItems] = useState([]);
   const [orders, setOrders] = useState([]);
-
-  // Add these two lines:
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   const navigate = useNavigate();
-  const jwtToken = Cookies.get('jwt_token');
+  const jwtToken = Cookies.get("jwt_token");
 
   // Add to Cart
   const addToCart = (product) => {
@@ -79,7 +78,7 @@ const App = () => {
     };
     setOrders((prev) => [...prev, orderItem]);
     removeFromWatchlist(item.id);
-    navigate('/orders');
+    navigate("/orders");
   };
 
   // Place Order (from Cart)
@@ -94,6 +93,7 @@ const App = () => {
     removeFromWatchlist(item.id);
   };
 
+  // --- Authentication Check ---
   if (!jwtToken) {
     return <LoginForm />;
   }
@@ -104,7 +104,7 @@ const App = () => {
         cartCount={cartItems.length}
         watchlistCount={watchlistItems.length}
         ordersCount={orders.length}
-        onSearch={setSearchTerm}  // Pass setter to Navbar for search input
+        onSearch={setSearchTerm}
       />
 
       <Routes>
@@ -138,6 +138,9 @@ const App = () => {
         <Route path="/orders" element={<Orders orders={orders} />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+
+      {/* 👇 Floating AI Chatbot */}
+      <Chatbot />
     </>
   );
 };
