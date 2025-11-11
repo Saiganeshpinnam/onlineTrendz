@@ -1,70 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Cookies from "js-cookie";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { CartProvider, useCart } from "./contexts/CartContext";
 import LoginForm from "./components/LoginForm";
 import ProductList from "./components/ProductsList";
 import Cart from "./components/Cart";
 import Navbar from "./components/Navbar";
 import Watchlist from "./components/Watchlist";
 import Orders from "./components/Orders";
-import Chatbot from "./components/Chatbot"; // 👈 import chatbot
+import Chatbot from "./components/Chatbot";
 
-const App = () => {
-  const [cartItems, setCartItems] = useState([]);
+const AppContent = () => {
   const [watchlistItems, setWatchlistItems] = useState([]);
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const { cart, removeFromCart, updateQuantity, addToCart, cartCount } = useCart();
   const navigate = useNavigate();
   const jwtToken = Cookies.get("jwt_token");
 
-  // Add to Cart
-  const addToCart = (product) => {
-    const existing = cartItems.find((item) => item.id === product.id);
-    if (existing) {
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
-      );
-    } else {
-      setCartItems((prev) => [...prev, { ...product, quantity: 1 }]);
-    }
-  };
-
-  // Update quantity
-  const updateCartQuantity = (id, newQty) => {
-    if (newQty < 1) {
-      removeFromCart(id);
-      return;
-    }
-
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: newQty } : item
-      )
-    );
-  };
-
-  // Remove from Cart
-  const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
   // Save for Later (move to Watchlist)
   const saveForLater = (id) => {
-    const item = cartItems.find((item) => item.id === id);
+    const item = cart.find((item) => item._id === id);
     if (item) {
-      setWatchlistItems((prev) => [...prev, item]);
+      setWatchlistItems((prev) => [...prev, { ...item }]);
       removeFromCart(id);
     }
   };
 
   // Remove from Watchlist
   const removeFromWatchlist = (id) => {
-    setWatchlistItems((prev) => prev.filter((item) => item.id !== id));
+    setWatchlistItems((prev) => prev.filter((item) => item._id !== id));
   };
 
   // Buy Now (from Watchlist)
@@ -77,20 +42,19 @@ const App = () => {
       orderPlaced: true,
     };
     setOrders((prev) => [...prev, orderItem]);
-    removeFromWatchlist(item.id);
+    removeFromWatchlist(item._id);
     navigate("/orders");
   };
 
   // Place Order (from Cart)
-  const onOrderPlaced = (orderSummary) => {
+  const handleOrderPlaced = (orderSummary) => {
     setOrders((prev) => [...prev, ...orderSummary]);
-    setCartItems([]); // clear cart after order placed
   };
 
   // Add from Watchlist to Cart
   const addFromWatchlistToCart = (item) => {
     addToCart(item);
-    removeFromWatchlist(item.id);
+    removeFromWatchlist(item._id);
   };
 
   // --- Authentication Check ---
@@ -99,11 +63,11 @@ const App = () => {
   }
 
   return (
-    <>
+    <div className="app">
       <Navbar
-        cartCount={cartItems.length}
         watchlistCount={watchlistItems.length}
         ordersCount={orders.length}
+        cartCount={cartCount}
         onSearch={setSearchTerm}
       />
 
@@ -116,11 +80,11 @@ const App = () => {
           path="/cart"
           element={
             <Cart
-              cartItems={cartItems}
-              onRemoveItem={removeFromCart}
-              onUpdateQuantity={updateCartQuantity}
+              cartItems={cart}
               onSaveForLater={saveForLater}
-              onOrderPlaced={onOrderPlaced}
+              onRemoveItem={removeFromCart}
+              onUpdateQuantity={updateQuantity}
+              onOrderPlaced={handleOrderPlaced}
             />
           }
         />
@@ -141,8 +105,14 @@ const App = () => {
 
       {/* 👇 Floating AI Chatbot */}
       <Chatbot />
-    </>
+    </div>
   );
 };
+
+const App = () => (
+  <CartProvider>
+    <AppContent />
+  </CartProvider>
+);
 
 export default App;

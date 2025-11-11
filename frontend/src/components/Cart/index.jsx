@@ -1,43 +1,61 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './index.css';
 
-const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onSaveForLater, onOrderPlaced }) => {
+const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity, onSaveForLater, onOrderPlaced }) => {
   const [orderedItems, setOrderedItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState('');
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderSummary, setOrderSummary] = useState([]);
 
+  const navigate = useNavigate();
+
   const calculateTotal = () =>
-    cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    cartItems.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
 
   const handleProceedToPay = () => {
+    if (cartItems.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+
     if (!paymentMethod) {
       alert('⚠️ Please select a payment method');
       return;
     }
 
-    const summary = cartItems.map(item => {
-      const randomDays = Math.floor(Math.random() * 6) + 2; // 2–7 days
-      return {
-        ...item,
-        deliveryDays: randomDays,
-        orderPlaced: true,
-      };
-    });
+    const summary = cartItems.map(item => ({
+      ...item,
+      deliveryDays: Math.floor(Math.random() * 6) + 2, // 2–7 days
+      orderPlaced: true,
+    }));
 
-    setOrderedItems(summary.map(i => i.id));
+    setOrderedItems(cartItems.map(i => i._id));
     setOrderSummary(summary);
     setOrderSuccess(true);
 
-    if (typeof onOrderPlaced === 'function') {
+    if (onOrderPlaced) {
       onOrderPlaced(summary);
     }
   };
 
-  if (cartItems.length === 0 && !orderSuccess) {
-    return <div className='empty-cart-container'><p className="cart-empty">🛒 Your cart is empty</p> 
-    <img src="https://res.cloudinary.com/dgv10egbw/image/upload/v1757684630/Screenshot_2025-09-12_191334_duvbjy.png" alt="Empty Cart" className="empty-cart-image" />
-    </div>;
+  if ((!cartItems || cartItems.length === 0) && !orderSuccess) {
+    return (
+      <div className='empty-cart-container'>
+        <p className="cart-empty">🛒 Your cart is empty</p> 
+        <img 
+          src="https://res.cloudinary.com/dgv10egbw/image/upload/v1757684630/Screenshot_2025-09-12_191334_duvbjy.png" 
+          alt="Empty Cart" 
+          className="empty-cart-image" 
+        />
+        <button 
+          className="continue-shopping-btn"
+          onClick={() => navigate('/')}
+        >
+          Continue Shopping
+        </button>
+      </div>
+    );
   }
   
   if (orderSuccess) {
@@ -70,21 +88,64 @@ const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onSaveForLater, onOrd
       <h2 className="cart-title">🛒 Your Cart</h2>
       <ul className="cart-items">
         {cartItems.map(item => (
-          <li key={item.id} className="cart-item">
-            <img src={item.image} alt={item.name} className="cart-item-image" />
+          <li key={item._id} className="cart-item">
+            <img 
+              src={item.imageUrl || 'https://via.placeholder.com/100'} 
+              alt={item.name} 
+              className="cart-item-image" 
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://via.placeholder.com/100';
+              }}
+            />
             <div className="cart-item-details">
               <h4>{item.name}</h4>
-              <p>Price: ₹{item.price * item.quantity}</p>
+              <p className="category">{item.category}</p>
+              <p className="price">${item.price.toFixed(2)} each</p>
               <div className="quantity-controls">
-                <button onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}>-</button>
-                <span>{item.quantity}</span>
-                <button onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}>+</button>
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onUpdateQuantity(item._id, (item.quantity || 1) - 1);
+                  }}
+                  disabled={(item.quantity || 1) <= 1}
+                >
+                  -
+                </button>
+                <span>{item.quantity || 1}</span>
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onUpdateQuantity(item._id, (item.quantity || 1) + 1);
+                  }}
+                >
+                  +
+                </button>
               </div>
+              <p className="item-total">Total: ${(item.price * (item.quantity || 1)).toFixed(2)}</p>
               <div className="cart-item-actions">
-                <button className="remove-btn" onClick={() => onRemoveItem(item.id)}>Remove</button>
-                <button className="save-btn" onClick={() => onSaveForLater(item.id)}>Save for Later</button>
+                <button 
+                  className="remove-btn" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onRemoveItem(item._id);
+                  }}
+                >
+                  Remove
+                </button>
+                {onSaveForLater && (
+                  <button 
+                    className="save-btn" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onSaveForLater(item._id);
+                    }}
+                  >
+                    Save for Later
+                  </button>
+                )}
               </div>
-              {orderedItems.includes(item.id) && (
+              {orderedItems.includes(item._id) && (
                 <p className="order-placed-label">✅ Order Placed</p>
               )}
             </div>
@@ -93,30 +154,57 @@ const Cart = ({ cartItems, onRemoveItem, onUpdateQuantity, onSaveForLater, onOrd
       </ul>
 
       <div className="cart-summary">
-        <h3>Total: ₹{calculateTotal()}</h3>
+        <h3>Subtotal ({cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0)} items): 
+          <span className="total-amount">${calculateTotal().toFixed(2)}</span>
+        </h3>
+        <div className="checkout-actions">
+          <button 
+            className="continue-shopping"
+            onClick={() => navigate('/')}
+          >
+            Continue Shopping
+          </button>
+          <button 
+            className="checkout-btn"
+            onClick={handleProceedToPay}
+            disabled={cartItems.length === 0}
+          >
+            Proceed to Checkout
+          </button>
+        </div>
         <div className="payment-method">
+          <h4>Select Payment Method:</h4>
+          <label>
+            <input
+              type="radio"
+              name="payment"
+              value="credit"
+              checked={paymentMethod === 'credit'}
+              onChange={() => setPaymentMethod('credit')}
+            />
+            Credit Card
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="payment"
+              value="paypal"
+              checked={paymentMethod === 'paypal'}
+              onChange={() => setPaymentMethod('paypal')}
+            />
+            PayPal
+          </label>
           <label>
             <input
               type="radio"
               name="payment"
               value="cod"
-              onChange={e => setPaymentMethod(e.target.value)}
+              checked={paymentMethod === 'cod'}
+              onChange={() => setPaymentMethod('cod')}
             />
             Cash on Delivery
           </label>
-          <label>
-            <input
-              type="radio"
-              name="payment"
-              value="upi"
-              onChange={e => setPaymentMethod(e.target.value)}
-            />
-            UPI
-          </label>
         </div>
-        <button className="proceed-btn" onClick={handleProceedToPay}>
-          Proceed to Pay
-        </button>
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ const ProductList = ({ onAdd, searchTerm = '' }) => {
 
   const handleAddToCart = (product) => {
     onAdd(product);
-    setAddedItems((prev) => [...prev, product._id]);
+    setAddedItems((prev) => [...prev, product.id]);
   };
 
   const categories = ['All', ...new Set(products.map(product => product.category))];
@@ -48,55 +48,50 @@ const ProductList = ({ onAdd, searchTerm = '' }) => {
   }
 
   return (
-    <div className="product-wrapper">
+    <div className="product-list">
       <div className="category-filter">
-        <label htmlFor="category-select">Filter by Category:</label>
-        <select
-          id="category-select"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {category[0].toUpperCase() + category.slice(1)}
-            </option>
-          ))}
-        </select>
+        {categories.map((category) => (
+          <button
+            key={category}
+            className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
+            onClick={() => setSelectedCategory(category)}
+          >
+            {category}
+          </button>
+        ))}
       </div>
 
-      <div className="product-grid">
-        {filteredProducts.length === 0 ? (
-          <p className="no-results">No products found.</p>
-        ) : (
-          filteredProducts.map((product) => {
-            const { _id, name, category, price, imageUrl } = product;
-            const isAdded = addedItems.includes(_id);
-            return (
-              <div key={_id} className="product-card">
-                <img
-                  src={imageUrl}
-                  alt={name}
-                  className="product-img"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = 'https://via.placeholder.com/150?text=No+Image';
-                  }}
-                />
-                <div className="product-info">
-                  <h3 className="product-name">{name}</h3>
-                  <div className="product-category">{category}</div>
-                  <div className="product-price">₹ {price}/-</div>
-                </div>
+      <div className="products-grid">
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
+            <div key={product._id} className="product-card">
+              <img 
+                src={product.imageUrl} 
+                alt={product.name} 
+                className="product-image"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://via.placeholder.com/200';
+                }}
+              />
+              <div className="product-info">
+                <h3>{product.name}</h3>
+                <p className="category">{product.category}</p>
+                <p className="price">${product.price.toFixed(2)}</p>
                 <button
-                  className={`add-to-cart-btn ${isAdded ? 'added' : ''}`}
+                  className={`add-to-cart-btn ${
+                    addedItems.includes(product._id) ? 'added' : ''
+                  }`}
                   onClick={() => handleAddToCart(product)}
-                  disabled={isAdded}
+                  disabled={addedItems.includes(product._id)}
                 >
-                  {isAdded ? '✔ Added' : 'Add to Cart'}
+                  {addedItems.includes(product._id) ? 'Added to Cart' : 'Add to Cart'}
                 </button>
               </div>
-            );
-          })
+            </div>
+          ))
+        ) : (
+          <div className="no-products">No products found</div>
         )}
       </div>
     </div>

@@ -5,14 +5,48 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const OpenAI = require("openai");
 const Item = require("./models/Item");
+const Product = require("./models/Product");
 
 const app = express();
 const PORT = process.env.PORT || 7000;
 const JWT_SECRET = process.env.JWT_SECRET || "your_real_jwt_secret";
 
 // --- Middleware ---
-app.use(cors());
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'];
+
+// Enable CORS for all routes
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  
+  next();
+});
+
 app.use(express.json());
+
+// --- Routes ---
+
+// Get all products
+app.get('/api/products', async (req, res) => {
+    try {
+        const products = await Product.find({});
+        res.json(products);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).json({ message: 'Error fetching products' });
+    }
+});
+
 
 // --- MongoDB Connection ---
 const mongoURI =
@@ -22,7 +56,6 @@ mongoose
   .connect(mongoURI)
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
-
 // --- OpenAI Setup ---
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -31,20 +64,45 @@ const openai = new OpenAI({
 // --- Dummy User Login (for testing only) ---
 const users = [{ username: "admin", password: "admin123" }];
 
-app.post("/login", (req, res, next) => {
+// User login
+app.post("/login", (req, res) => {
   try {
+    console.log('Login attempt:', req.body);
+    
     const { username, password } = req.body;
-    const user = users.find(
-      (u) => u.username === username && u.password === password
-    );
-
-    if (user) {
-      return res.json({ jwt_token: JWT_SECRET });
-    } else {
-      return res.status(401).json({ error_msg: "Invalid credentials" });
+    
+    if (!username || !password) {
+      return res.status(400).json({ 
+        success: false,
+        error_msg: 'Username and password are required' 
+      });
     }
+
+    const user = users.find(u => u.username === username && u.password === password);
+
+    if (!user) {
+      console.log('Invalid login attempt for user:', username);
+      return res.status(401).json({ 
+        success: false,
+        error_msg: 'Invalid username or password' 
+      });
+    }
+
+    console.log('Successful login for user:', username);
+    return res.json({ 
+      success: true,
+      jwt_token: JWT_SECRET,
+      user: { 
+        username: user.username 
+      } 
+    });
+
   } catch (err) {
-    next(err);
+    console.error('Login error:', err);
+    return res.status(500).json({ 
+      success: false,
+      error_msg: 'Internal server error' 
+    });
   }
 });
 

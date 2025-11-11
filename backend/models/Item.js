@@ -24,6 +24,11 @@ const itemSchema = new mongoose.Schema({
     default: 0,
     min: 0,
   },
+  imageUrl: {
+    type: String,
+    required: true,
+    default: 'https://via.placeholder.com/200',
+  },
 }, {
   timestamps: true,
 });
