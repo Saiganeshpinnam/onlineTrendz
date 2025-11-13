@@ -14,27 +14,30 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
+  const getPid = (p) => String(p?._id || p?.id || `${p?.name}-${p?.category}`);
+
   const addToCart = (product) => {
     setCart(prevCart => {
-      // Check if product already exists in cart
-      const existingItem = prevCart.find(item => item._id === product._id);
+      const pid = getPid(product);
+      // Check if product already exists in cart by pid
+      const existingItem = prevCart.find(item => item.pid === pid);
       
       if (existingItem) {
         // If exists, increase quantity
         return prevCart.map(item =>
-          item._id === product._id
+          item.pid === pid
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
       
       // If not exists, add new item with quantity 1
-      return [...prevCart, { ...product, quantity: 1 }];
+      return [...prevCart, { ...product, pid, quantity: 1 }];
     });
   };
 
   const removeFromCart = (productId) => {
-    setCart(prevCart => prevCart.filter(item => item._id !== productId));
+    setCart(prevCart => prevCart.filter(item => item.pid !== String(productId)));
   };
 
   const updateQuantity = (productId, newQuantity) => {
@@ -45,7 +48,7 @@ export const CartProvider = ({ children }) => {
     
     setCart(prevCart =>
       prevCart.map(item =>
-        item._id === productId ? { ...item, quantity: newQuantity } : item
+        item.pid === String(productId) ? { ...item, quantity: newQuantity } : item
       )
     );
   };

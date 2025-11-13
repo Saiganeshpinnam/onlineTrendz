@@ -25,9 +25,12 @@ const ProductList = ({ onAdd, searchTerm = '' }) => {
     fetchProducts();
   }, []);
 
+  const getPid = (p) => String(p?._id || p?.id || `${p?.name}-${p?.category}`);
+
   const handleAddToCart = (product) => {
     onAdd(product);
-    setAddedItems((prev) => [...prev, product._id]);
+    const pid = getPid(product);
+    setAddedItems((prev) => (prev.includes(pid) ? prev : [...prev, pid]));
   };
 
   const categories = ['All', ...new Set(products.map(product => product.category))];
@@ -69,10 +72,11 @@ const ProductList = ({ onAdd, searchTerm = '' }) => {
           <p className="no-results">No products found.</p>
         ) : (
           filteredProducts.map((product) => {
-            const { _id, name, category, price, imageUrl } = product;
-            const isAdded = addedItems.includes(_id);
+            const { name, category, price, imageUrl } = product;
+            const pid = getPid(product);
+            const isAdded = addedItems.includes(pid);
             return (
-              <div key={_id} className="product-card">
+              <div key={pid} className="product-card">
                 <img
                   src={imageUrl}
                   alt={name}

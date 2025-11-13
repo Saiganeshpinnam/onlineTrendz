@@ -1,7 +1,3 @@
-const mongoose = require('mongoose');
-const Product = require('./models/Product');
-require('dotenv').config();
-
 const dummyProducts = [
   {
     id: 1,
@@ -124,27 +120,4 @@ const dummyProducts = [
   },
 ];
 
-
-const seedDB = async () => {
-    try {
-        // Connect to MongoDB
-        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/onlineTrendz');
-        console.log('Connected to MongoDB');
-
-        // Clear existing products
-        await Product.deleteMany({});
-        console.log('Cleared existing products');
-
-        // Insert dummy products
-        await Product.insertMany(dummyProducts);
-        console.log('Added dummy products');
-
-        console.log('Database seeded successfully!');
-        process.exit(0);
-    } catch (error) {
-        console.error('Error seeding database:', error);
-        process.exit(1);
-    }
-};
-
-seedDB();
+module.exports = dummyProducts;

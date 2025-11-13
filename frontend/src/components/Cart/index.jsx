@@ -30,7 +30,7 @@ const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity, onSaveForLater, 
       orderPlaced: true,
     }));
 
-    setOrderedItems(cartItems.map(i => i._id));
+    setOrderedItems(cartItems.map(i => i.pid || i._id));
     setOrderSummary(summary);
     setOrderSuccess(true);
 
@@ -67,8 +67,11 @@ const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity, onSaveForLater, 
           <h3>📦 Order Summary</h3>
           <ul>
             {orderSummary.map(item => (
-              <li key={item.id} className="order-item">
-                <img src={item.image} alt={item.name} className="order-item-image" />
+              <li key={item.pid || item._id || item.id || `${item.name}-${item.category}`}
+                  className="order-item">
+                <img src={item.imageUrl || item.image || 'https://via.placeholder.com/100'}
+                     alt={item.name}
+                     className="order-item-image" />
                 <div>
                   <p className="order-item-name">{item.name}</p>
                   <p>Qty: {item.quantity}</p>
@@ -88,7 +91,7 @@ const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity, onSaveForLater, 
       <h2 className="cart-title">🛒 Your Cart</h2>
       <ul className="cart-items">
         {cartItems.map(item => (
-          <li key={item._id} className="cart-item">
+          <li key={item.pid || item._id} className="cart-item">
             <img 
               src={item.imageUrl || 'https://via.placeholder.com/100'} 
               alt={item.name} 
@@ -106,7 +109,7 @@ const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity, onSaveForLater, 
                 <button 
                   onClick={(e) => {
                     e.preventDefault();
-                    onUpdateQuantity(item._id, (item.quantity || 1) - 1);
+                    onUpdateQuantity(item.pid || item._id, (item.quantity || 1) - 1);
                   }}
                   disabled={(item.quantity || 1) <= 1}
                 >
@@ -116,7 +119,7 @@ const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity, onSaveForLater, 
                 <button 
                   onClick={(e) => {
                     e.preventDefault();
-                    onUpdateQuantity(item._id, (item.quantity || 1) + 1);
+                    onUpdateQuantity(item.pid || item._id, (item.quantity || 1) + 1);
                   }}
                 >
                   +
@@ -128,7 +131,7 @@ const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity, onSaveForLater, 
                   className="remove-btn" 
                   onClick={(e) => {
                     e.preventDefault();
-                    onRemoveItem(item._id);
+                    onRemoveItem(item.pid || item._id);
                   }}
                 >
                   Remove
@@ -138,14 +141,14 @@ const Cart = ({ cartItems = [], onRemoveItem, onUpdateQuantity, onSaveForLater, 
                     className="save-btn" 
                     onClick={(e) => {
                       e.preventDefault();
-                      onSaveForLater(item._id);
+                      onSaveForLater(item.pid || item._id);
                     }}
                   >
                     Save for Later
                   </button>
                 )}
               </div>
-              {orderedItems.includes(item._id) && (
+              {orderedItems.includes(item.pid || item._id) && (
                 <p className="order-placed-label">✅ Order Placed</p>
               )}
             </div>

@@ -6,6 +6,10 @@ const mongoose = require("mongoose");
 const OpenAI = require("openai");
 const Item = require("./models/Item");
 const Product = require("./models/Product");
+const dummyProducts = require("./seedProducts");
+
+// Disable buffering so queries fail fast when MongoDB is down
+mongoose.set('bufferCommands', false);
 
 const app = express();
 const PORT = process.env.PORT || 7000;
@@ -40,10 +44,16 @@ app.use(express.json());
 app.get('/api/products', async (req, res) => {
     try {
         const products = await Product.find({});
-        res.json(products);
+        return res.json(products);
     } catch (error) {
-        console.error('Error fetching products:', error);
-        res.status(500).json({ message: 'Error fetching products' });
+        console.error('Error fetching products from DB. Serving dummy products:', error?.message || error);
+        try {
+          // Fallback: serve dummy products if DB is down/unavailable
+          return res.json(dummyProducts);
+        } catch (fallbackErr) {
+          console.error('Fallback to dummy products failed:', fallbackErr);
+          return res.status(500).json({ message: 'Error fetching products' });
+        }
     }
 });
 
@@ -54,7 +64,18 @@ const mongoURI =
 
 mongoose
   .connect(mongoURI)
-  .then(() => console.log("✅ Connected to MongoDB"))
+  .then(async () => {
+    console.log("✅ Connected to MongoDB");
+    try {
+      const productCount = await Product.countDocuments();
+      if (productCount === 0) {
+        await Product.insertMany(dummyProducts);
+        console.log("🌱 Seeded dummy products");
+      }
+    } catch (seedErr) {
+      console.error("Seeding error:", seedErr);
+    }
+  })
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 // --- OpenAI Setup ---
 const openai = new OpenAI({
